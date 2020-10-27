@@ -15,17 +15,19 @@ plt.rcParams['font.family'] = 'serif'
 plt.rcParams['font.size'] = 16
 
 # set the simulation parameters
-nx =  21   # number of spatial grid points 
+nx =  81   # number of spatial grid points 
 L = 2.0     # lenght of spatial 1D domain
 dx = L/(nx-1)  # spatial grid size
 nt = 25   # number of time steps 
-dt = .025   # time step size
+#dt = .025   # time step size
 #tf = 0.5    # final time (optional if we want to calc our sol. up to a certain time)
 #dt = tf/(nt-1)  # time-step size as function of total time and the number of time steps     
 
 #constants 
 c = 1   # convection speed
- 
+sigma = 0.5 #CFL constant
+dt = sigma * dx / c  # time step size calculated based on CFL constraint to assure the stability of the solution
+
 
 # define the grid point coordinates
 x = numpy.linspace(0,L,nx)
