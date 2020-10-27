@@ -7,37 +7,76 @@ Created on Mon Oct 26 13:37:16 2020
 """
 
 import numpy 
-import matplotlib.pyplot as pl
-import timeit
+import matplotlib.pyplot as plt
+#import timeit
+
+#set the plot properties 
+plt.rcParams['font.family'] = 'serif'
+plt.rcParams['font.size'] = 16
 
 # set the simulation parameters
-# nt = 51
-nx = 21
-nt = 25    #nt is the number of timesteps we want to calculate
-dt = .025  #dt is the amount of time each timestep covers (delta t)
-tf = 0.5
-xf = 2.0
-# dt = tf/(nt-1)
-dx = xf/(nx-1)
+nx =  21   # number of spatial grid points 
+L = 2.0     # lenght of spatial 1D domain
+dx = L/(nx-1)  # spatial grid size
+nt = 25   # number of time steps 
+dt = .025   # time step size
+#tf = 0.5    # final time (optional if we want to calc our sol. up to a certain time)
+#dt = tf/(nt-1)  # time-step size as function of total time and the number of time steps     
+
+#constants 
+c = 1   # convection speed
+ 
+
+# define the grid point coordinates
+x = numpy.linspace(0,L,nx)
 
 # Initialize data structure 
-u = numpy.ones(nx)
-x = numpy.linspace(0,xf,nx)
+u0= numpy.ones(nx)      # gives all nx elemants in u a value of 1 as initial value 
+#u0 = numpy.zeros(nx)    # will give all nx elements in u a value of zero
+
+# Initial Conditions u = 2.0 where 0.5 <= x <= 1.0.
+#u0[int(0.5/dx):int(1/dx+1)]=2 
+mask = numpy.where(numpy.logical_and(x >= 0.5, x <= 1.0))
+u0[mask] = 2.0
+print(u0)
+
+
+# Initialize the solution array
+u = u0.copy()
 
 # Boundary conditions 
-u[0]=u[nx-1]=1
 
-# Initial Conditions
-u[int(0.5/dx):int(1/dx+1)]=2
+u[0]=u[nx-1]=1 
+
+
 
 #plot initial conditions
-pl.plot(x,u)
+#plt.plot(x,u0)
 
-# nummerical scheme FD in time BD in space 
 
-for n in range (0,nt):
-    un=u.copy()    
-    for i in range (1,nx):
-        u[i]= un[i]-1*(dt/dx)*(un[i]-un[i-1])
-    pl.plot(x,u)
+# numerical scheme FD in time BD in space Euler`s method
+
+# for n in range (0,nt):
+#     un=u.copy()    
+#     for i in range (1,nx):
+#         u[i]= un[i]-c*(dt/dx)*(un[i]-un[i-1])
+# plt.plot(x,u)
 #print(u)
+
+
+# numerical scheme Euler`s method with array slicing
+for n in range (1,nt):
+    u[1:]=u[1:]-c*(dt/dx)*(u[1:]-u[:-1])
+    # u[0]=u[nx-1]=1 
+#plt.plot(x,u)
+    
+#Plotting
+plt.figure(figsize=(4.0,4.0))
+plt.xlabel('X')
+plt.ylabel('u')
+plt.grid()
+plt.plot(x, u0, label='initial', color = 'C0', linestyle = '--', linewidth = 2)
+plt.plot(x, u, label='nt={}'.format(nt), color = 'C1', linestyle = '-', linewidth = 2)
+plt.legend()
+plt.xlim(0.0,L)
+plt.ylim(0.0,2.5)
